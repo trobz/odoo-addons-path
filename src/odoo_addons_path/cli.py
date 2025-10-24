@@ -1,9 +1,17 @@
 from pathlib import Path
-from typing import Annotated, Optional
+from typing import Annotated
 
 import typer
 
 from .main import get_addons_path
+
+
+def _parse_paths(value: str) -> list[Path]:
+    if not value:
+        return []
+    paths = [Path(p.strip()) for p in value.split(",") if p.strip()]
+    return paths
+
 
 app = typer.Typer()
 
@@ -22,27 +30,19 @@ def main(
         ),
     ] = Path("./"),
     addons_dirs: Annotated[
-        Optional[list[Path]],
+        str | None,
         typer.Option(
-            help="A directory that contains addon directories.",
-            exists=True,
-            file_okay=False,
-            dir_okay=True,
-            resolve_path=True,
+            help="Comma-separated directories that contain addon directories (repositories with multiple Odoo modules).",
         ),
     ] = None,
     addons_dir: Annotated[
-        Optional[list[Path]],
+        str | None,
         typer.Option(
-            help="A directory that is an addon directory.",
-            exists=True,
-            file_okay=False,
-            dir_okay=True,
-            resolve_path=True,
+            help="Comma-separated directories that are addon directories (contain Odoo modules).",
         ),
     ] = None,
     odoo_dir: Annotated[
-        Optional[Path],
+        Path | None,
         typer.Option(
             help="The directory containing the Odoo source code.",
             exists=True,
@@ -51,8 +51,27 @@ def main(
             resolve_path=True,
         ),
     ] = None,
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            "-v",
+        ),
+    ] = False,
 ):
     """
     Return addons_path constructor
     """
-    get_addons_path(codebase=codebase, addons_dirs=addons_dirs, addons_dir=addons_dir, odoo_dir=odoo_dir, cli=True)
+    parsed_addons_dirs = _parse_paths(addons_dirs) if addons_dirs else None
+    parsed_addons_dir = _parse_paths(addons_dir) if addons_dir else None
+
+    addons_path = get_addons_path(
+        codebase=codebase,
+        addons_dirs=parsed_addons_dirs,
+        addons_dir=parsed_addons_dir,
+        odoo_dir=odoo_dir,
+        verbose=verbose,
+    )
+
+    if not verbose:
+        typer.echo(addons_path)
