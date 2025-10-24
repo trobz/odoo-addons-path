@@ -48,7 +48,14 @@ def get_addons_path(
         else:
             detected_paths = {}
 
-    _add_to_path(all_paths["odoo_dir"], [odoo_dir] if odoo_dir else detected_paths.get("odoo_dir", []))
+    if odoo_dir:
+        _add_to_path(
+            all_paths["odoo_dir"],
+            [
+                odoo_dir / "addons",
+                odoo_dir / "odoo" / "addons",
+            ],
+        )
     _add_to_path(
         all_paths["external_src"],
         addons_dirs or detected_paths.get("addons_dirs", []),

@@ -1,4 +1,3 @@
-import glob
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Any, Optional
@@ -150,7 +149,16 @@ class GenericDetector(CodeBaseDetector):
     """
 
     def detect(self, codebase: Path) -> Optional[tuple[str, dict[str, Any]]]:
-        manifest_files = glob.glob(str(codebase / "**" / "__manifest__.py"), recursive=True)
+        manifest_files = []
+        for manifest_file in codebase.glob("**/__manifest__.py"):
+            # ignore setup folder in a module
+            if "setup" in manifest_file.parts:
+                continue
+            # ignore folder in a same folder
+            str_manifest_file = str(manifest_file)
+            if str_manifest_file.count("__manifest__.py") > 1:
+                continue
+            manifest_files.append(str_manifest_file)
         if not manifest_files:
             return super().detect(codebase)
 
