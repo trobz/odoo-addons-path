@@ -1,5 +1,4 @@
 from pathlib import Path
-from typing import Optional
 
 import typer
 
@@ -18,15 +17,15 @@ def _add_to_path(path_list: list[str], dirs_to_add: list[Path], is_sorted: bool 
 
 def get_addons_path(
     codebase: Path,
-    addons_dirs: Optional[list[Path]] = None,
-    addons_dir: Optional[list[Path]] = None,
-    odoo_dir: Optional[Path] = None,
-    cli: bool = False,
-) -> list[str]:
+    addons_dirs: list[Path] | None = None,
+    addons_dir: list[Path] | None = None,
+    odoo_dir: Path | None = None,
+    verbose: bool = False,
+) -> str:
     all_paths: dict[str, list[str]] = {
         "odoo_dir": [],
-        "external_src": [],
-        "local_src": [],
+        "addon_repositories": [],
+        "addon_directories": [],
         "themes": [],
     }
 
@@ -43,31 +42,48 @@ def get_addons_path(
         res = trobz.detect(codebase)
         if res:
             detector_name, detected_paths = res
-            if cli:
+            if verbose:
                 typer.echo(f"Codebase layout: {detector_name}")
         else:
             detected_paths = {}
 
-    _add_to_path(all_paths["odoo_dir"], [odoo_dir] if odoo_dir else detected_paths.get("odoo_dir", []))
+    if odoo_dir:
+        _add_to_path(
+            all_paths["odoo_dir"],
+            [
+                odoo_dir / "addons",
+                odoo_dir / "odoo" / "addons",
+            ],
+        )
+    else:
+        _add_to_path(
+            all_paths["odoo_dir"],
+            detected_paths.get("odoo_dir", []),
+        )
+
     _add_to_path(
-        all_paths["external_src"],
+        all_paths["addon_repositories"],
         addons_dirs or detected_paths.get("addons_dirs", []),
         is_sorted=True,
     )
     _add_to_path(
-        all_paths["local_src"],
+        all_paths["addon_directories"],
         addons_dir or detected_paths.get("addons_dir", []),
         is_sorted=True,
     )
 
-    if cli:
+    result = []
+    for paths in all_paths.values():
+        result.extend(paths)
+    addons_path = ",".join(result)
+
+    if verbose:
         for category, paths in all_paths.items():
             if paths:
                 typer.echo(f"\n# {category}")
                 for path in paths:
                     typer.echo(path)
+        typer.echo("\n# addons_path")
+        typer.echo(addons_path)
 
-    result = []
-    for paths in all_paths.values():
-        result.extend(paths)
-    return result
+    return addons_path
