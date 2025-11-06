@@ -28,8 +28,8 @@ def base_dir(tmp_path: Path) -> Path:
         (
             "c2c",
             [
-                "odoo/src/odoo/addons",
                 "odoo/src/addons",
+                "odoo/src/odoo/addons",
                 "odoo/external-src/custom-repo",
                 "odoo/local-src",
             ],
