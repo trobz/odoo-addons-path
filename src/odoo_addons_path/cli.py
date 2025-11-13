@@ -40,20 +40,12 @@ def main(
             resolve_path=True,
         ),
     ] = Path("./"),
-    addons_dirs: Annotated[
-        list[str] | None,
-        typer.Option(
-            help=(
-                "Paths that contain addon directories (repositories with multiple Odoo modules). "
-                "Globs and comma-separated values are supported."
-            ),
-        ),
-    ] = None,
     addons_dir: Annotated[
         list[str] | None,
         typer.Option(
             help=(
-                "Paths that are addon directories (contain Odoo modules). "
+                "Paths that are addon directories (contain Odoo modules) or "
+                "paths that contain addon directories (repositories with multiple Odoo modules). "
                 "Globs and comma-separated values are supported."
             ),
         ),
@@ -79,13 +71,11 @@ def main(
     """
     Return addons_path constructor
     """
-    parsed_addons_dirs = _parse_paths(addons_dirs)
-    parsed_addons_dir = _parse_paths(addons_dir)
+    paths = _parse_paths(addons_dir)
 
     addons_path = get_addons_path(
         codebase=codebase,
-        addons_dirs=parsed_addons_dirs,
-        addons_dir=parsed_addons_dir,
+        addons_dir=paths,
         odoo_dir=odoo_dir,
         verbose=verbose,
     )

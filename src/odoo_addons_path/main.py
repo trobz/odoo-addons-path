@@ -15,15 +15,6 @@ def _add_to_path(path_list: list[str], dirs_to_add: list[Path], is_sorted: bool 
                 path_list.append(resolved_path)
 
 
-def _get_addons_from_repos(repos: list[Path]) -> list[Path]:
-    addon_paths = []
-    for repo in repos:
-        if repo.is_dir():
-            for manifest_file in repo.glob("**/__manifest__.py"):
-                addon_paths.append(manifest_file.parent.parent)
-    return list(set(addon_paths))
-
-
 def _detect_codebase_layout(codebase: Path, verbose: bool = False) -> dict:
     trobz = TrobzDetector()
     c2c = C2CDetector()
@@ -44,7 +35,6 @@ def _detect_codebase_layout(codebase: Path, verbose: bool = False) -> dict:
 def _process_paths(
     all_paths: dict[str, list[str]],
     detected_paths: dict,
-    addons_dirs: list[Path] | None,
     addons_dir: list[Path] | None,
     odoo_dir: Path | None,
 ):
@@ -56,21 +46,28 @@ def _process_paths(
     if detected_paths.get("odoo_dir"):
         _add_to_path(all_paths["odoo_dir"], detected_paths["odoo_dir"])
 
-    # repositories
-    addon_repos_to_scan = (addons_dirs or []) + detected_paths.get("addons_dirs", [])
-    if addon_repos_to_scan:
-        scanned_paths = _get_addons_from_repos(addon_repos_to_scan)
-        _add_to_path(all_paths["addon_repositories"], scanned_paths, is_sorted=True)
+    all_addon_paths_to_process = (
+        (addons_dir or []) + detected_paths.get("addons_dirs", []) + detected_paths.get("addons_dir", [])
+    )
 
-    # addon directories
-    direct_addon_paths = (addons_dir or []) + detected_paths.get("addons_dir", [])
-    if direct_addon_paths:
-        _add_to_path(all_paths["addon_repositories"], direct_addon_paths, is_sorted=True)
+    result = set()
+
+    for p in all_addon_paths_to_process:
+        if not p.is_dir():
+            continue
+        manifests = p.glob("**/__manifest__.py")
+        for manifest in manifests:
+            result.add(manifest.parent.parent)
+
+    _add_to_path(
+        all_paths["addon_repositories"],
+        list(result),
+        is_sorted=True,
+    )
 
 
 def get_addons_path(
     codebase: Path,
-    addons_dirs: list[Path] | None = None,
     addons_dir: list[Path] | None = None,
     odoo_dir: Path | None = None,
     verbose: bool = False,
@@ -81,10 +78,10 @@ def get_addons_path(
     }
 
     detected_paths = {}
-    if not addons_dirs and not addons_dir:
+    if not addons_dir:
         detected_paths = _detect_codebase_layout(codebase, verbose)
 
-    _process_paths(all_paths, detected_paths, addons_dirs, addons_dir, odoo_dir)
+    _process_paths(all_paths, detected_paths, addons_dir, odoo_dir)
 
     result = [path for paths in all_paths.values() for path in paths]
     addons_path = ",".join(result)
