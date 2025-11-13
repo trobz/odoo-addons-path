@@ -50,19 +50,21 @@ def _process_paths(
         (addons_dir or []) + detected_paths.get("addons_dirs", []) + detected_paths.get("addons_dir", [])
     )
 
-    result = set()
+    result = []
 
     for p in all_addon_paths_to_process:
         if not p.is_dir():
             continue
         manifests = p.glob("**/__manifest__.py")
-        for manifest in manifests:
-            result.add(manifest.parent.parent)
+        for manifest in sorted(manifests):
+            repo_path = manifest.parent.parent
+            if repo_path not in result:
+                result.append(repo_path)
 
     _add_to_path(
         all_paths["addon_repositories"],
-        list(result),
-        is_sorted=True,
+        result,
+        is_sorted=not bool(addons_dir),
     )
 
 
