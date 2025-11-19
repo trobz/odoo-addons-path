@@ -16,12 +16,12 @@ pip install odoo-addons-path
 odoo-addons-path /path/to/your/odoo/project
 ```
 
-# Example: This will find addon directories that inside '18.0' directories
+#### Example: This will find addon directories that inside '18.0' directories
 ```bash
 odoo-addons-path --addons-dir "./tests/data/repo-version-module/*/18.0"
 ```
 
-# Example: List of repo directories
+#### Example: List of repo directories
 ```bash
 odoo-addons-path --verbose --addons-dir "./tests/data/c2c-new/odoo/external-src/, ./tests/data/c2c/odoo/external-src/"
 ```
