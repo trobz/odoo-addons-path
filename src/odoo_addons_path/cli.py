@@ -1,3 +1,4 @@
+import glob
 from pathlib import Path
 from typing import Annotated
 
@@ -6,10 +7,20 @@ import typer
 from .main import get_addons_path
 
 
-def _parse_paths(value: str) -> list[Path]:
-    if not value:
+def _parse_paths(values: list[str] | None) -> list[Path]:
+    if not values:
         return []
-    paths = [Path(p.strip()) for p in value.split(",") if p.strip()]
+    paths: list[Path] = []
+    for value in values:
+        for p_str in value.split(","):
+            p_str = p_str.strip()
+            if not p_str:
+                continue
+            p = Path(p_str).expanduser()
+            if "*" in str(p) or "?" in str(p) or "[" in str(p):
+                paths.extend(Path(g) for g in sorted(glob.glob(str(p), recursive=True)))
+            else:
+                paths.append(p)
     return paths
 
 
@@ -29,26 +40,20 @@ def main(
             resolve_path=True,
         ),
     ] = Path("./"),
-    addons_dirs: Annotated[
-        str | None,
-        typer.Option(
-            help="Comma-separated directories that contain addon directories (repositories with multiple Odoo modules).",
-        ),
-    ] = None,
     addons_dir: Annotated[
-        str | None,
+        list[str] | None,
         typer.Option(
-            help="Comma-separated directories that are addon directories (contain Odoo modules).",
+            help=(
+                "Paths that are addon directories (contain Odoo modules) or "
+                "paths that contain addon directories (repositories with multiple Odoo modules). "
+                "Globs and comma-separated values are supported."
+            ),
         ),
     ] = None,
     odoo_dir: Annotated[
-        Path | None,
+        str | None,
         typer.Option(
-            help="The directory containing the Odoo source code.",
-            exists=True,
-            file_okay=False,
-            dir_okay=True,
-            resolve_path=True,
+            help="Path containing the Odoo source code.",
         ),
     ] = None,
     verbose: Annotated[
@@ -62,14 +67,19 @@ def main(
     """
     Return addons_path constructor
     """
-    parsed_addons_dirs = _parse_paths(addons_dirs) if addons_dirs else None
-    parsed_addons_dir = _parse_paths(addons_dir) if addons_dir else None
+    odoo_dir_path = None
+    if odoo_dir:
+        odoo_dir_path = Path(odoo_dir).expanduser()
+        if not odoo_dir_path.exists():
+            typer.secho(f"Odoo dir {odoo_dir} not found.", fg=typer.colors.RED)
+            raise typer.Exit(1)
+
+    paths = _parse_paths(addons_dir)
 
     addons_path = get_addons_path(
         codebase=codebase,
-        addons_dirs=parsed_addons_dirs,
-        addons_dir=parsed_addons_dir,
-        odoo_dir=odoo_dir,
+        addons_dir=paths,
+        odoo_dir=odoo_dir_path,
         verbose=verbose,
     )
 

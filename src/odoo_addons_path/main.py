@@ -15,9 +15,61 @@ def _add_to_path(path_list: list[str], dirs_to_add: list[Path], is_sorted: bool 
                 path_list.append(resolved_path)
 
 
+def _detect_codebase_layout(codebase: Path, verbose: bool = False) -> dict:
+    trobz = TrobzDetector()
+    c2c = C2CDetector()
+    odoo_sh = OdooShDetector()
+    doodba = DoodbaDetector()
+    fallback = GenericDetector()
+    trobz.set_next(c2c).set_next(odoo_sh).set_next(doodba).set_next(fallback)
+    res = trobz.detect(codebase)
+    if not res:
+        typer.secho("No codebase layout detected", fg=typer.colors.RED)
+        raise typer.Exit(1)
+    detector_name, detected_paths = res
+    if verbose:
+        typer.echo(f"Codebase layout: {detector_name}")
+    return detected_paths
+
+
+def _process_paths(
+    all_paths: dict[str, list[str]],
+    detected_paths: dict,
+    addons_dir: list[Path] | None,
+    odoo_dir: Path | None,
+):
+    if odoo_dir:
+        _add_to_path(
+            all_paths["odoo_dir"],
+            [odoo_dir / "addons", odoo_dir / "odoo" / "addons"],
+        )
+    if detected_paths.get("odoo_dir"):
+        _add_to_path(all_paths["odoo_dir"], detected_paths["odoo_dir"])
+
+    all_addon_paths_to_process = (
+        (addons_dir or []) + detected_paths.get("addons_dirs", []) + detected_paths.get("addons_dir", [])
+    )
+
+    result = []
+
+    for p in all_addon_paths_to_process:
+        if not p.is_dir():
+            continue
+        manifests = p.glob("**/__manifest__.py")
+        for manifest in sorted(manifests):
+            repo_path = manifest.parent.parent
+            if repo_path not in result:
+                result.append(repo_path)
+
+    _add_to_path(
+        all_paths["addon_repositories"],
+        result,
+        is_sorted=not bool(addons_dir),
+    )
+
+
 def get_addons_path(
     codebase: Path,
-    addons_dirs: list[Path] | None = None,
     addons_dir: list[Path] | None = None,
     odoo_dir: Path | None = None,
     verbose: bool = False,
@@ -25,56 +77,15 @@ def get_addons_path(
     all_paths: dict[str, list[str]] = {
         "odoo_dir": [],
         "addon_repositories": [],
-        "addon_directories": [],
-        "themes": [],
     }
 
     detected_paths = {}
-    if not addons_dirs and not addons_dir:
-        trobz = TrobzDetector()
-        c2c = C2CDetector()
-        odoo_sh = OdooShDetector()
-        doodba = DoodbaDetector()
-        fallback = GenericDetector()
+    if not addons_dir:
+        detected_paths = _detect_codebase_layout(codebase, verbose)
 
-        trobz.set_next(c2c).set_next(odoo_sh).set_next(doodba).set_next(fallback)
+    _process_paths(all_paths, detected_paths, addons_dir, odoo_dir)
 
-        res = trobz.detect(codebase)
-        if res:
-            detector_name, detected_paths = res
-            if verbose:
-                typer.echo(f"Codebase layout: {detector_name}")
-        else:
-            detected_paths = {}
-
-    if odoo_dir:
-        _add_to_path(
-            all_paths["odoo_dir"],
-            [
-                odoo_dir / "addons",
-                odoo_dir / "odoo" / "addons",
-            ],
-        )
-    else:
-        _add_to_path(
-            all_paths["odoo_dir"],
-            detected_paths.get("odoo_dir", []),
-        )
-
-    _add_to_path(
-        all_paths["addon_repositories"],
-        addons_dirs or detected_paths.get("addons_dirs", []),
-        is_sorted=True,
-    )
-    _add_to_path(
-        all_paths["addon_directories"],
-        addons_dir or detected_paths.get("addons_dir", []),
-        is_sorted=True,
-    )
-
-    result = []
-    for paths in all_paths.values():
-        result.extend(paths)
+    result = [path for paths in all_paths.values() for path in paths]
     addons_path = ",".join(result)
 
     if verbose:
