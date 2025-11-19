@@ -18,7 +18,7 @@ def _parse_paths(values: list[str] | None) -> list[Path]:
                 continue
             p = Path(p_str).expanduser()
             if "*" in str(p) or "?" in str(p) or "[" in str(p):
-                paths.extend(Path(g) for g in glob.glob(str(p), recursive=True))
+                paths.extend(Path(g) for g in sorted(glob.glob(str(p), recursive=True)))
             else:
                 paths.append(p)
     return paths
