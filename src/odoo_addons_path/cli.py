@@ -51,13 +51,9 @@ def main(
         ),
     ] = None,
     odoo_dir: Annotated[
-        Path | None,
+        str | None,
         typer.Option(
             help="Path containing the Odoo source code.",
-            exists=True,
-            file_okay=False,
-            dir_okay=True,
-            resolve_path=True,
         ),
     ] = None,
     verbose: Annotated[
@@ -71,12 +67,19 @@ def main(
     """
     Return addons_path constructor
     """
+    odoo_dir_path = None
+    if odoo_dir:
+        odoo_dir_path = Path(odoo_dir).expanduser()
+        if not odoo_dir_path.exists():
+            typer.secho(f"Odoo dir {odoo_dir} not found.", fg=typer.colors.RED)
+            raise typer.Exit(1)
+
     paths = _parse_paths(addons_dir)
 
     addons_path = get_addons_path(
         codebase=codebase,
         addons_dir=paths,
-        odoo_dir=odoo_dir,
+        odoo_dir=odoo_dir_path,
         verbose=verbose,
     )
 
