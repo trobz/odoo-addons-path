@@ -35,6 +35,11 @@ jobs:
         run: |
           git reset --hard ${{ github.sha }}
 
+      - name: Set up the environment
+        uses: ./.github/actions/setup-python-env
+        with:
+          python-version: "3.12"
+
       - name: Semantic Version Release
         id: release
         uses: python-semantic-release/python-semantic-release@v10.5.2
