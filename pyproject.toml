@@ -92,3 +92,22 @@ ignore = [
 
 [tool.ruff.format]
 preview = true
+
+[tool.semantic_release]
+version_toml = ["pyproject.toml:project.version"]
+# w/o this, uv.lock is out of sync with pyproject.toml
+build_command = """
+    uv lock --upgrade-package "$PACKAGE_NAME"
+    git add uv.lock
+    uv build
+"""
+
+[semantic_release.changelog]
+exclude_commit_patterns = [
+    '''chore(?:\([^)]*?\))?: .+''',
+    '''ci(?:\([^)]*?\))?: .+''',
+    '''style(?:\([^)]*?\))?: .+''',
+    '''test(?:\([^)]*?\))?: .+''',
+    '''build\((?!deps\): .+)''',
+    '''Initial [Cc]ommit.*''',
+]
