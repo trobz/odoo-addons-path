@@ -75,7 +75,10 @@ jobs:
           python-version: "3.12"
 
       - name: Build package
-        run: uv build
+        run: |
+          uv lock --upgrade-package odoo-addons-path
+          git add uv.lock
+          uv build
 
       - name: Publish package distributions to PyPI
         uses: pypa/gh-action-pypi-publish@v1.13.0
