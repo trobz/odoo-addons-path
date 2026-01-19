@@ -80,7 +80,8 @@ def get_addons_path(
     }
 
     detected_paths = {}
-    if not addons_dir:
+    # Skip detector only if both paths are None (no explicit paths provided)
+    if not addons_dir and not odoo_dir:
         detected_paths = _detect_codebase_layout(codebase, verbose)
 
     _process_paths(all_paths, detected_paths, addons_dir, odoo_dir)
