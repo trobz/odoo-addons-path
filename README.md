@@ -140,14 +140,6 @@ git commit -m "feat!: breaking change" # Creates MAJOR version
 - pyyaml
 - typer >= 0.19.2
 
-## License
-
-MIT
-
-## Contributing
-
-Contributions welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
 ## Status
 
 **v1.0.0** - Stable release (Nov 25, 2025)
