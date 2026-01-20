@@ -1,6 +1,6 @@
 [project]
 name = "odoo-addons-path"
-version = "1.0.0"
+version = "1.0.1"
 description = "Create the ultimate Odoo addons_path constructor"
 authors = [{ name = "trisdoan", email = "doanminhtri8183@gmail.com" }]
 readme = "README.md"
