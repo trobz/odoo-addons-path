@@ -1,9 +1,5 @@
 # odoo-addons-path
 
-[![PyPI version](https://img.shields.io/pypi/v/odoo-addons-path)](https://pypi.org/project/odoo-addons-path/)
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
-[![Tests](https://github.com/trobz/odoo-addons-path/actions/workflows/main.yml/badge.svg)](https://github.com/trobz/odoo-addons-path)
-
 Automatically detect and construct Odoo `addons_path` for various project layouts.
 
 ## Problem
