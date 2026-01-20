@@ -1,5 +1,4 @@
 name: "Setup Python Environment"
-description: "Set up Python environment for the given Python version"
 
 inputs:
   python-version:
@@ -9,7 +8,6 @@ inputs:
   uv-version:
     description: "uv version to use"
     required: true
-    default: "0.6.14"
 
 runs:
   using: "composite"
