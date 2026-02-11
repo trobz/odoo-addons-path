@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 
 import typer
@@ -15,7 +16,7 @@ def _add_to_path(path_list: list[str], dirs_to_add: list[Path], is_sorted: bool 
                 path_list.append(resolved_path)
 
 
-def _detect_codebase_layout(codebase: Path, verbose: bool = False) -> dict:
+def detect_codebase_layout(codebase: Path, verbose: bool = False) -> dict:
     trobz = TrobzDetector()
     c2c = C2CDetector()
     odoo_sh = OdooShDetector()
@@ -30,6 +31,18 @@ def _detect_codebase_layout(codebase: Path, verbose: bool = False) -> dict:
     if verbose:
         typer.echo(f"Codebase layout: {detector_name}")
     return detected_paths
+
+
+def get_odoo_version_from_release(odoo_dir: Path) -> str | None:
+    """Read the Odoo version (e.g. '18.0') from ``odoo/release.py``."""
+    release_py = odoo_dir / "odoo" / "release.py"
+    if not release_py.is_file():
+        return None
+    content = release_py.read_text()
+    match = re.search(r"version_info\s*=\s*\((\d+),\s*(\d+)", content)
+    if match:
+        return f"{match.group(1)}.{match.group(2)}"
+    return None
 
 
 def _process_paths(
@@ -73,18 +86,18 @@ def get_addons_path(
     addons_dir: list[Path] | None = None,
     odoo_dir: Path | None = None,
     verbose: bool = False,
+    detected_paths: dict | None = None,
 ) -> str:
     all_paths: dict[str, list[str]] = {
         "odoo_dir": [],
         "addon_repositories": [],
     }
 
-    detected_paths = {}
     # Skip detector only if both paths are None (no explicit paths provided)
-    if not addons_dir and not odoo_dir:
-        detected_paths = _detect_codebase_layout(codebase, verbose)
+    if detected_paths is None and not addons_dir and not odoo_dir:
+        detected_paths = detect_codebase_layout(codebase, verbose)
 
-    _process_paths(all_paths, detected_paths, addons_dir, odoo_dir)
+    _process_paths(all_paths, detected_paths or {}, addons_dir, odoo_dir)
 
     result = [path for paths in all_paths.values() for path in paths]
     addons_path = ",".join(result)
