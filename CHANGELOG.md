@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.1.0 (2026-02-24)
+
+### Features
+
+- Expose public API for odoo-venv integration
+  ([`4c85ee6`](https://github.com/trobz/odoo-addons-path/commit/4c85ee613e2261ecc7c3a3164a196ab2a12ffca3))
+
+
 ## v1.0.1 (2026-01-20)
 
 ### Bug Fixes
