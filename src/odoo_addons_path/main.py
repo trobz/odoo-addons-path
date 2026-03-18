@@ -180,8 +180,9 @@ def get_addons_path(
         "addon_repositories": [],
     }
 
-    # Skip detector only if both paths are None (no explicit paths provided)
-    if detected_paths is None and not addons_dir and not odoo_dir:
+    # Always detect layout so project addons are discovered even when
+    # odoo_dir or addons_dir are given explicitly.
+    if detected_paths is None:
         detected_paths = detect_codebase_layout(codebase, verbose)
 
     _process_paths(all_paths, detected_paths or {}, addons_dir, odoo_dir)

@@ -83,10 +83,9 @@ def main(
 
     paths = _parse_paths(addons_dir)
 
-    # Detect layout once so we can reuse it for version checking
-    detected_paths = None
-    if not paths and not odoo_dir_path:
-        detected_paths = detect_codebase_layout(codebase, verbose)
+    # Always detect layout so project addons are discovered even when
+    # --odoo-dir or --addons-dir are given explicitly.
+    detected_paths = detect_codebase_layout(codebase, verbose)
 
     addons_path = get_addons_path(
         codebase=codebase,
