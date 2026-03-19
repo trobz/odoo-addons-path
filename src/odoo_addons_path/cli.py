@@ -27,6 +27,20 @@ def _parse_paths(values: list[str] | None) -> list[Path]:
 app = typer.Typer()
 
 
+def run():
+    # Typer default command has limitation so we need to manually set it
+    # https://github.com/fastapi/typer/issues/18
+    import sys
+
+    from typer.core import TyperGroup
+    from typer.main import get_command_name, get_group
+
+    group: TyperGroup = get_group(app)
+    if len(sys.argv) < 2 or sys.argv[1] not in [get_command_name(key) for key in group.commands]:
+        sys.argv.insert(1, "main")
+    app()
+
+
 @app.command()
 def main(
     codebase: Annotated[
@@ -104,3 +118,39 @@ def main(
 
     if not verbose:
         typer.echo(addons_path)
+
+
+@app.command()
+def odoo_path(
+    codebase: Annotated[
+        Path,
+        typer.Argument(
+            envvar="CODEBASE",
+            help="Path to the Odoo project. Can also be set via the CODEBASE environment variable.",
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            resolve_path=True,
+        ),
+    ] = Path("./"),
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose",
+            "-v",
+        ),
+    ] = False,
+):
+    """
+    Return the Odoo source directory (odoo_dir[0].parent).
+    """
+    detected_paths = detect_codebase_layout(codebase, verbose)
+    odoo_dirs = detected_paths.get("odoo_dir", [])
+    if not odoo_dirs:
+        typer.secho("No Odoo directory detected.", fg=typer.colors.RED)
+        raise typer.Exit(1)
+    typer.echo(odoo_dirs[0].parent)
+
+
+if __name__ == "__main__":
+    run()

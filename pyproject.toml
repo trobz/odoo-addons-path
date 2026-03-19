@@ -12,7 +12,7 @@ dependencies = [
 ]
 
 [project.scripts]
-odoo-addons-path= "odoo_addons_path.cli:app"
+odoo-addons-path= "odoo_addons_path.cli:run"
 
 
 [project.urls]
