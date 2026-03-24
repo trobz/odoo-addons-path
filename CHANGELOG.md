@@ -2,6 +2,19 @@
 
 <!-- version list -->
 
+## v1.2.0 (2026-03-24)
+
+### Bug Fixes
+
+- Always detect codebase layout even when --odoo-dir or --addons-dir given
+  ([`e3bc609`](https://github.com/trobz/odoo-addons-path/commit/e3bc609c33bace1e8bf23d547ea367768e710774))
+
+### Features
+
+- Add Odoo version detection from manifests and version consistency check
+  ([`43ddb3b`](https://github.com/trobz/odoo-addons-path/commit/43ddb3b373c6e5a02e8da1158839cabd56c45e58))
+
+
 ## v1.1.0 (2026-02-24)
 
 ### Features
