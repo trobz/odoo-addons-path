@@ -1,4 +1,6 @@
+import ast
 import re
+from collections import Counter
 from pathlib import Path
 
 import typer
@@ -43,6 +45,91 @@ def get_odoo_version_from_release(odoo_dir: Path) -> str | None:
     if match:
         return f"{match.group(1)}.{match.group(2)}"
     return None
+
+
+def _extract_version_from_manifest(manifest_path: Path) -> str | None:
+    """Extract the major version (e.g. '18.0') from a ``__manifest__.py`` file."""
+    try:
+        content = manifest_path.read_text()
+        data = ast.literal_eval(content)
+    except (OSError, ValueError, SyntaxError):
+        return None
+    version = data.get("version") if isinstance(data, dict) else None
+    if not version or not isinstance(version, str):
+        return None
+    # Only accept full Odoo format: major.minor.patch.patch.patch (e.g. "18.0.1.0.0")
+    match = re.match(r"(\d+\.\d+)\.\d+\.\d+\.\d+$", version)
+    return match.group(1) if match else None
+
+
+def get_odoo_version_from_addons(addons_path: str) -> str | None:
+    """Infer Odoo version from the manifests found in an addons path string.
+
+    Returns the most common major version (e.g. ``'18.0'``), or ``None`` if
+    no version could be determined.
+    """
+    versions: list[str] = []
+    for path_str in addons_path.split(","):
+        path = Path(path_str)
+        if not path.is_dir():
+            continue
+        for manifest in path.glob("*/__manifest__.py"):
+            v = _extract_version_from_manifest(manifest)
+            if v:
+                versions.append(v)
+    if not versions:
+        return None
+    counter = Counter(versions)
+    return counter.most_common(1)[0][0]
+
+
+def check_version_consistency(addons_path: str) -> dict[str, list[str]]:
+    """Check for version discrepancies across all addons in the path.
+
+    Returns a dict mapping each detected major version to the list of addon
+    names using that version.  An empty dict means no versions were found.
+    """
+    version_addons: dict[str, list[str]] = {}
+    for path_str in addons_path.split(","):
+        path = Path(path_str)
+        if not path.is_dir():
+            continue
+        for manifest in path.glob("*/__manifest__.py"):
+            v = _extract_version_from_manifest(manifest)
+            if v:
+                version_addons.setdefault(v, []).append(manifest.parent.name)
+    return version_addons
+
+
+def get_odoo_version(
+    addons_path: str,
+    odoo_dir: Path | None = None,
+    detected_paths: dict | None = None,
+) -> str | None:
+    """Return the Odoo major version (e.g. ``'18.0'``).
+
+    Tries ``odoo/release.py`` first (from *odoo_dir* or the detected layout),
+    then falls back to inferring the version from addon manifests.
+    """
+    # Try release.py from explicit odoo_dir
+    if odoo_dir:
+        version = get_odoo_version_from_release(odoo_dir)
+        if version:
+            return version
+
+    # Try release.py from detected odoo_dir paths
+    if detected_paths and detected_paths.get("odoo_dir"):
+        for odoo_path in detected_paths["odoo_dir"]:
+            # odoo_dir entries point to e.g. <root>/odoo/addons — walk up to find release.py
+            candidate = odoo_path
+            while candidate != candidate.parent:
+                version = get_odoo_version_from_release(candidate)
+                if version:
+                    return version
+                candidate = candidate.parent
+
+    # Fallback: infer from addon manifests
+    return get_odoo_version_from_addons(addons_path)
 
 
 def _process_paths(
@@ -93,8 +180,9 @@ def get_addons_path(
         "addon_repositories": [],
     }
 
-    # Skip detector only if both paths are None (no explicit paths provided)
-    if detected_paths is None and not addons_dir and not odoo_dir:
+    # Always detect layout so project addons are discovered even when
+    # odoo_dir or addons_dir are given explicitly.
+    if detected_paths is None:
         detected_paths = detect_codebase_layout(codebase, verbose)
 
     _process_paths(all_paths, detected_paths or {}, addons_dir, odoo_dir)
@@ -103,6 +191,9 @@ def get_addons_path(
     addons_path = ",".join(result)
 
     if verbose:
+        version = get_odoo_version(addons_path, odoo_dir=odoo_dir, detected_paths=detected_paths)
+        if version:
+            typer.echo(f"Odoo version: {version}")
         for category, paths in all_paths.items():
             if paths:
                 typer.echo(f"\n# {category}")

@@ -43,6 +43,7 @@ extend-safe-fixes = ["UP008"]
 
 [lint.per-file-ignores]
 "tests/*" = ["S101"]
+"tests/data/**/__manifest__.py" = ["B018"]
 
 [format]
 preview = true

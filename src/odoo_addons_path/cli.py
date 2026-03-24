@@ -4,7 +4,7 @@ from typing import Annotated
 
 import typer
 
-from .main import get_addons_path
+from .main import check_version_consistency, detect_codebase_layout, get_addons_path
 
 
 def _parse_paths(values: list[str] | None) -> list[Path]:
@@ -63,6 +63,13 @@ def main(
             "-v",
         ),
     ] = False,
+    check_versions: Annotated[
+        bool,
+        typer.Option(
+            "--check-versions",
+            help="Check for version discrepancies across addons and warn if multiple Odoo versions are found.",
+        ),
+    ] = False,
 ):
     """
     Return addons_path constructor
@@ -76,12 +83,24 @@ def main(
 
     paths = _parse_paths(addons_dir)
 
+    # Always detect layout so project addons are discovered even when
+    # --odoo-dir or --addons-dir are given explicitly.
+    detected_paths = detect_codebase_layout(codebase, verbose)
+
     addons_path = get_addons_path(
         codebase=codebase,
         addons_dir=paths,
         odoo_dir=odoo_dir_path,
         verbose=verbose,
+        detected_paths=detected_paths,
     )
+
+    if check_versions:
+        version_addons = check_version_consistency(addons_path)
+        if len(version_addons) > 1:
+            typer.secho("WARNING: Multiple Odoo versions detected in addons path!", fg=typer.colors.YELLOW, err=True)
+            for version, addons in sorted(version_addons.items()):
+                typer.secho(f"  {version}: {', '.join(sorted(addons))}", fg=typer.colors.YELLOW, err=True)
 
     if not verbose:
         typer.echo(addons_path)
