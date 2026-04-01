@@ -15,6 +15,9 @@ dependencies = [
 odoo-addons-path= "odoo_addons_path.cli:app"
 
 
+[project.optional-dependencies]
+build = ["uv ~= 0.7.12"]
+
 [project.urls]
 Repository = "https://github.com/trobz/odoo-addons-path"
 
@@ -95,7 +98,12 @@ preview = true
 
 [tool.semantic_release]
 version_toml = ["pyproject.toml:project.version"]
-
+build_command = """
+  python -m pip install -e '.[build]'
+  uv lock --upgrade-package odoo-addons-path
+  git add uv.lock
+  uv build
+"""
 
 [tool.semantic_release.changelog]
 exclude_commit_patterns = [
