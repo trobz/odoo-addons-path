@@ -1,0 +1,31 @@
+[project]
+site_name = "odoo-addons-path"
+site_url = "https://trobz.github.io/odoo-addons-path/"
+site_description = "Automatically detect and construct Odoo addons_path for various project layouts."
+site_author = "trisdoan"
+docs_dir = "docs"
+site_dir = "site"
+extra_css = ["stylesheets/hero.css", "stylesheets/site.css"]
+nav = [
+  {Home = "index.md"},
+  {"Getting Started" = "getting-started.md"},
+  {"Supported Layouts" = "supported-layouts.md"},
+  {"API Reference" = "api-reference.md"},
+  {Contributing = "contributing.md"},
+]
+
+[[project.extra_javascript]]
+path = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
+defer = true
+
+[[project.extra_javascript]]
+path = "javascripts/hero-scene.js"
+defer = true
+
+[[project.extra_javascript]]
+path = "javascripts/commit-count.js"
+defer = true
+
+[project.theme]
+name = "modern"
+custom_dir = "overrides"

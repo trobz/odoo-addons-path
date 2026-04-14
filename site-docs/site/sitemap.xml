@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+      <url>
+        <loc>https://trobz.github.io/odoo-addons-path/</loc>
+      </url>
+      <url>
+        <loc>https://trobz.github.io/odoo-addons-path/getting-started/</loc>
+      </url>
+      <url>
+        <loc>https://trobz.github.io/odoo-addons-path/supported-layouts/</loc>
+      </url>
+      <url>
+        <loc>https://trobz.github.io/odoo-addons-path/api-reference/</loc>
+      </url>
+      <url>
+        <loc>https://trobz.github.io/odoo-addons-path/contributing/</loc>
+      </url>
+</urlset>

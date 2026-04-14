@@ -1,0 +1,216 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+
+        <meta name="description" content="Automatically detect and construct Odoo addons_path for various project layouts.">
+
+
+        <meta name="author" content="trisdoan">
+
+
+        <link rel="canonical" href="https://trobz.github.io/odoo-addons-path/">
+
+
+
+        <link rel="next" href="./getting-started/">
+
+
+
+
+
+      <link rel="icon" href="./assets/images/favicon.png">
+      <meta name="generator" content="zensical-0.0.31">
+
+
+
+        <title>Home - odoo-addons-path</title>
+
+
+
+
+
+
+      <link rel="stylesheet" href="./assets/stylesheets/modern/main.53a7feaf.min.css">
+
+
+
+
+
+
+
+
+
+
+
+
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Inter:300,300i,400,400i,500,500i,700,700i%7CJetBrains+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Inter";--md-code-font:"JetBrains Mono"}</style>
+
+
+
+      <link rel="stylesheet" href="./stylesheets/hero.css">
+
+      <link rel="stylesheet" href="./stylesheets/site.css">
+
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce(((e,t)=>(e<<5)-e+t.charCodeAt(0)),0),__md_get=(e,t=localStorage,a=__md_scope)=>JSON.parse(t.getItem(a.pathname+"."+e)),__md_set=(e,t,a=localStorage,_=__md_scope)=>{try{a.setItem(_.pathname+"."+e,JSON.stringify(t))}catch(e){}},document.documentElement.setAttribute("data-platform",navigator.platform)</script>
+
+
+
+
+
+  </head>
+
+
+    <body dir="ltr">
+
+
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer" aria-label="Navigation"></label>
+    <div data-md-component="skip">
+
+
+        <a href="#home" class="md-skip">
+          Skip to content
+        </a>
+
+    </div>
+    <div data-md-component="announce">
+
+    </div>
+
+
+    <div class="md-container" data-md-component="container">
+
+
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+
+
+            <div class="md-content" data-md-component="content">
+
+              <article class="md-content__inner md-typeset">
+
+<div class="ov-landing">
+
+
+  <canvas id="hero-canvas" class="ov-landing__canvas" aria-hidden="true"></canvas>
+
+
+  <main class="ov-split">
+
+
+    <div class="ov-split__copy">
+
+      <div class="ov-hero__badge" aria-label="Terminal command example">
+        <span class="ov-hero__prompt">$</span>
+        <span class="ov-hero__cmd">uv tool install odoo-addons-path</span>
+        <span class="ov-hero__cursor" aria-hidden="true"></span>
+      </div>
+
+      <h1 class="ov-hero__title">
+        <span class="ov-hero__line ov-hero__line--1">odoo-addons-path</span>
+      </h1>
+
+      <p class="ov-hero__subtitle">
+        Auto-detect your Odoo project layout and generate<br>
+        the correct <span class="ov-hero__accent">addons_path</span> — zero configuration needed
+      </p>
+
+      <div class="ov-hero__features">
+        <span class="ov-feature">
+          <svg class="ov-feature__icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          Trobz, C2C, Odoo.sh, Doodba
+        </span>
+        <span class="ov-feature">
+          <svg class="ov-feature__icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12" />
+          </svg>
+          CLI &amp; Python API
+        </span>
+
+        <span class="ov-feature" id="commit-count-badge" style="display:none">
+          <svg class="ov-feature__icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="3"/><line x1="12" y1="3" x2="12" y2="9"/>
+            <line x1="12" y1="15" x2="12" y2="21"/>
+          </svg>
+          <span id="commit-count-label">… commits</span>
+        </span>
+      </div>
+
+      <div class="ov-hero__actions">
+        <a href="./getting-started/" class="ov-btn ov-btn--primary">
+          Get Started
+          <svg class="ov-btn__icon" width="16" height="16" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M5 12h14M12 5l7 7-7 7" />
+          </svg>
+        </a>
+        <a href="https://github.com/trobz/odoo-addons-path" class="ov-btn ov-btn--ghost"
+          target="_blank" rel="noopener noreferrer">
+          <svg class="ov-btn__icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z" />
+          </svg>
+          GitHub
+        </a>
+      </div>
+
+    </div>
+
+
+    <div class="ov-split__demo">
+      <div class="ov-terminal-frame" role="img" aria-label="Demo">
+        <div class="ov-terminal-frame__body">
+          <img src="./demo.gif"
+            alt="CLI demo"
+            class="ov-terminal-frame__gif"
+            loading="eager" decoding="async" width="900">
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+              </article>
+            </div>
+
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+
+      </main>
+
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+
+
+
+
+
+      <script id="__config" type="application/json">{"annotate":null,"base":".","features":[],"search":"./assets/javascripts/workers/search.e2d2d235.min.js","tags":null,"translations":{"clipboard.copied":"Copied to clipboard","clipboard.copy":"Copy to clipboard","search.result.more.one":"1 more on this page","search.result.more.other":"# more on this page","search.result.none":"No matching documents","search.result.one":"1 matching document","search.result.other":"# matching documents","search.result.placeholder":"Type to start searching","search.result.term.missing":"Missing","select.version":"Select version"},"version":null}</script>
+
+
+      <script src="./assets/javascripts/bundle.91a19a9e.min.js"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js" defer></script>
+
+        <script src="./javascripts/hero-scene.js" defer></script>
+
+        <script src="./javascripts/commit-count.js" defer></script>
+
+
+  </body>
+</html>
