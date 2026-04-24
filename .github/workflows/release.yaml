@@ -24,7 +24,7 @@ jobs:
     steps:
 
       - name: Checkout Repository on Release Branch
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ github.ref_name }}
 
@@ -42,7 +42,7 @@ jobs:
 
       - name: Checkout at release tag
         if: steps.release.outputs.released == 'true'
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ steps.release.outputs.tag }}
 
