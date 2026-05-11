@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.3.0 (2026-05-11)
+
+### Features
+
+- Add Zensical documentation site
+  ([`26e0781`](https://github.com/trobz/odoo-addons-path/commit/26e078139354d117a11e1f37d5f2a756d7df843d))
+
+
 ## v1.2.0 (2026-03-24)
 
 ### Bug Fixes
