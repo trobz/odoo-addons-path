@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v1.5.0 (2026-06-12)
+
+### Features
+
+- Have option to show version
+  ([`18b3a4d`](https://github.com/trobz/odoo-addons-path/commit/18b3a4d2d04ddfa35f9c752b12b9c729a7164113))
+
+
 ## v1.4.0 (2026-05-22)
 
 ### Features
