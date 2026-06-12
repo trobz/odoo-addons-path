@@ -1,6 +1,7 @@
 import glob
 import json
 from enum import Enum
+from importlib.metadata import version
 from pathlib import Path
 from typing import Annotated
 
@@ -94,8 +95,24 @@ def _emit_json(
 app = typer.Typer()
 
 
+def version_callback(value: bool):
+    if value:
+        typer.echo(f"odoo-addons-path {version('odoo-addons-path')}")
+        raise typer.Exit()
+
+
 @app.command()
 def main(
+    version: Annotated[
+        bool,
+        typer.Option(
+            "--version",
+            "-V",
+            callback=version_callback,
+            is_eager=True,
+            help="Display the odoo-addons-path version.",
+        ),
+    ] = False,
     codebase: Annotated[
         Path,
         typer.Argument(
