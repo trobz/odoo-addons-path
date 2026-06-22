@@ -25,6 +25,7 @@ def test_format_json_trobz_layout():
     assert data["addons_path"] != ""
     # version may be None (empty manifests) but key must exist
     assert "version" in data
+    assert data["odoo_edition"] == "CE"
 
 
 def test_format_json_addons_path_equals_text_output():

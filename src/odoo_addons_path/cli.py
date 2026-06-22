@@ -8,7 +8,13 @@ from typing import Annotated
 import typer
 
 from .detector import C2CDetector, DoodbaDetector, GenericDetector, OdooShDetector, TrobzDetector
-from .main import check_version_consistency, detect_codebase_layout, get_addons_path, get_odoo_version
+from .main import (
+    check_version_consistency,
+    detect_codebase_layout,
+    get_addons_path,
+    get_odoo_edition,
+    get_odoo_version,
+)
 
 _MULTI_VERSION_WARNING = "WARNING: Multiple Odoo versions detected in addons path!"
 
@@ -78,6 +84,7 @@ def _emit_json(
     odoo_dir_list = [str(p) for p in effective_detected.get("odoo_dir", [])]
 
     version = get_odoo_version(addons_path, odoo_dir=odoo_dir_path, detected_paths=detected_paths)
+    edition = get_odoo_edition(addons_path)
 
     if check_versions:
         _warn_version_discrepancies(addons_path)
@@ -87,6 +94,7 @@ def _emit_json(
             "layout": layout_name,
             "odoo_dir": odoo_dir_list,
             "version": version,
+            "odoo_edition": edition,
             "addons_path": addons_path,
         })
     )
