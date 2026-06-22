@@ -132,6 +132,27 @@ def get_odoo_version(
     return get_odoo_version_from_addons(addons_path)
 
 
+# Conventional names of the Odoo Enterprise addons repository.
+_EE_DIR_NAMES = {"enterprise", "odoo-enterprise"}
+
+
+def get_odoo_edition(addons_path: str) -> str | None:
+    """Return the Odoo edition inferred from the addons path.
+
+    ``'EE'`` if an Enterprise addons dir (``enterprise`` / ``odoo-enterprise``)
+    is present, ``'CE'`` if addons are found without it, or ``None`` when the
+    addons path is empty.
+    """
+    if not addons_path:
+        return None
+
+    for path_str in addons_path.split(","):
+        if Path(path_str).name in _EE_DIR_NAMES:
+            return "EE"
+
+    return "CE"
+
+
 def _process_paths(
     all_paths: dict[str, list[str]],
     detected_paths: dict,
@@ -194,6 +215,11 @@ def get_addons_path(
         version = get_odoo_version(addons_path, odoo_dir=odoo_dir, detected_paths=detected_paths)
         if version:
             typer.echo(f"Odoo version: {version}")
+
+        edition = get_odoo_edition(addons_path)
+        if edition:
+            typer.echo(f"Odoo edition: {edition}")
+
         for category, paths in all_paths.items():
             if paths:
                 typer.echo(f"\n# {category}")

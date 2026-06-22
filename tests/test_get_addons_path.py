@@ -7,6 +7,7 @@ from odoo_addons_path.main import (
     check_version_consistency,
     detect_codebase_layout,
     get_addons_path,
+    get_odoo_edition,
     get_odoo_version,
     get_odoo_version_from_addons,
     get_odoo_version_from_manifest,
@@ -80,6 +81,7 @@ def test_layouts(base_dir: Path, layout: str, expected_paths: list[str]):
     result = get_addons_path(base_dir)
 
     assert result == expected_addons_path
+    assert get_odoo_edition(result) == ("EE" if layout == "odoo-sh" else "CE")
 
 
 @pytest.mark.parametrize("layout", ["trobz", "c2c", "doodba", "odoo-sh"])
