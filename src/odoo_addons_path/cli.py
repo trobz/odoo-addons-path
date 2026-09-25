@@ -12,6 +12,7 @@ from .main import (
     check_version_consistency,
     detect_codebase_layout,
     get_addons_path,
+    get_odoo_addons_dirs,
     get_odoo_edition,
     get_odoo_version,
 )
@@ -81,7 +82,7 @@ def _emit_json(
         verbose=False,
         detected_paths=effective_detected,
     )
-    odoo_dir_list = [str(p) for p in effective_detected.get("odoo_dir", [])]
+    odoo_dir_list = get_odoo_addons_dirs(effective_detected, odoo_dir_path)
 
     version = get_odoo_version(addons_path, odoo_dir=odoo_dir_path, detected_paths=detected_paths)
     edition = get_odoo_edition(addons_path)

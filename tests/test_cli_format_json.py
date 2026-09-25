@@ -212,3 +212,35 @@ def test_verbose_no_note_with_codebase():
     result = runner.invoke(app, ["-v", str(DATA / "trobz")])
     assert result.exit_code == 0
     assert "layout detection skipped" not in result.stderr
+
+
+def test_format_json_explicit_odoo_dir_without_codebase(tmp_path, monkeypatch):
+    # Explicit --odoo-dir must be reported in "odoo_dir", not only in addons_path
+    monkeypatch.delenv("CODEBASE", raising=False)
+    odoo_addons = tmp_path / "odoo_src" / "addons"
+    odoo_addons.mkdir(parents=True)
+
+    result = runner.invoke(app, ["--format", "json", "--odoo-dir", str(tmp_path / "odoo_src")])
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    assert data["layout"] is None
+    assert data["odoo_dir"] == [str(odoo_addons.resolve())]
+    assert str(odoo_addons.resolve()) in data["addons_path"]
+
+
+def test_format_json_explicit_odoo_dir_with_detected_layout(tmp_path):
+    # Explicit --odoo-dir comes first, followed by the detected layout's odoo dirs
+    odoo_addons = tmp_path / "odoo_src" / "addons"
+    odoo_addons.mkdir(parents=True)
+
+    result = runner.invoke(
+        app,
+        [str(DATA / "trobz"), "--format", "json", "--odoo-dir", str(tmp_path / "odoo_src")],
+    )
+    assert result.exit_code == 0
+    data = json.loads(result.stdout)
+    assert data["layout"] == "Trobz"
+    assert data["odoo_dir"][0] == str(odoo_addons.resolve())
+    assert len(data["odoo_dir"]) > 1
+    for d in data["odoo_dir"]:
+        assert d in data["addons_path"].split(",")
