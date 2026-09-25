@@ -30,19 +30,18 @@ odoo-addons-path /path/to/your/odoo/project
 # Verbose output — shows categorized paths
 odoo-addons-path /path/to/project --verbose
 
-# Explicit addons dir — detector is SKIPPED
+# Project given + explicit dirs — detector runs, explicit dirs are merged into its result
 odoo-addons-path /path/to/project --addons-dir "./addons/*/18.0,./custom"
-
-# Explicit Odoo dir — detector is SKIPPED
 odoo-addons-path /path/to/project --odoo-dir /opt/odoo
 
-# Both explicit paths
-odoo-addons-path /path/to/project --odoo-dir /opt/odoo --addons-dir "./custom"
+# No project given — detector SKIPPED (uses explicit paths only)
+odoo-addons-path --odoo-dir /opt/odoo --addons-dir "./custom"
 ```
 
-!!! note "Detector Skip Behavior"
-    The layout detector is skipped when **any** explicit `--addons-dir` or `--odoo-dir` is provided.
-    This ensures predictable, reproducible output when you specify paths manually.
+!!! note "Detection Behavior"
+    Layout detection runs only on a project path given explicitly — as the CLI argument or through the `CODEBASE` environment variable. The current directory is never detected implicitly.
+
+    Without a project path, the output is built only from `--addons-dir`/`--odoo-dir`. With neither a project path nor any explicit dir, the command prints an error to stderr and exits with status 1.
 
 ## Environment Variable
 
@@ -67,6 +66,13 @@ paths = get_addons_path(
     codebase=Path("/home/project"),
     addons_dir=[Path("/home/project/custom")],
     verbose=True,
+)
+
+# codebase=None skips detection — only addons_dir/odoo_dir are used
+paths = get_addons_path(
+    codebase=None,
+    odoo_dir=Path("/opt/odoo"),
+    addons_dir=[Path("/home/project/custom")],
 )
 ```
 
