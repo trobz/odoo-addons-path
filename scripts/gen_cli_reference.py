@@ -1,7 +1,7 @@
 """Regenerate site-docs/docs/cli-reference.md from the Typer app.
 
 Invoked by `make cli-docs` (and transitively `make docs`). Keeps the public
-docs site in sync with whatever flags/commands exist in odoo_addons_path.main
+docs site in sync with whatever flags/commands exist in odoo_addons_path.cli
 without manual edits — add a flag, run `make docs`, commit the diff.
 """
 
@@ -31,7 +31,7 @@ tags:
 def main() -> None:
     # `uv` is on PATH in the dev (`make`) and CI (`setup-uv`) environments.
     body = subprocess.check_output(
-        ["uv", "run", "typer", "odoo_addons_path.main", "utils", "docs", "--name", "odoo-addons-path"],  # noqa: S607
+        ["uv", "run", "typer", "odoo_addons_path.cli", "utils", "docs", "--name", "odoo-addons-path"],  # noqa: S607
         text=True,
     )
     # Typer emits `[default: X]`, `[required]`, etc. which Zensical/Markdown
