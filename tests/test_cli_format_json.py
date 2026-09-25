@@ -5,11 +5,41 @@ import subprocess
 import sys
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from odoo_addons_path.cli import app
 
 runner = CliRunner()
+
+
+def test_no_codebase_argument_skips_detection(tmp_path):
+    """Running with only explicit dirs from the tool's own repo must not
+    sweep tests/data fixtures: without a codebase argument, no layout
+    detection runs at all."""
+    (tmp_path / "odoo" / "addons").mkdir(parents=True)
+    (tmp_path / "addons").mkdir()
+    result = runner.invoke(
+        app,
+        ["--odoo-dir", str(tmp_path / "odoo"), "--addons-dir", str(tmp_path / "addons")],
+        catch_exceptions=False,
+    )
+
+    assert result.exit_code == 0
+    assert "tests/data" not in result.output
+    assert str(tmp_path / "odoo" / "addons") in result.output
+
+
+@pytest.mark.parametrize("args", [[], ["--format", "json"]])
+def test_no_input_at_all_errors(args, monkeypatch):
+    """Without a codebase, CODEBASE env var, --addons-dir or --odoo-dir,
+    the CLI must fail loudly instead of printing an empty addons path."""
+    monkeypatch.delenv("CODEBASE", raising=False)
+    result = runner.invoke(app, args)
+
+    assert result.exit_code == 1
+    assert "CODEBASE" in result.output
+
 
 DATA = Path(__file__).parent / "data"
 
@@ -162,3 +192,23 @@ def test_format_json_odoo_dir_on_undetected_layout(tmp_path):
     assert data["layout"] is None
     # addons_path must contain the odoo addons path
     assert str(odoo_addons.resolve()) in data["addons_path"]
+
+
+@pytest.mark.parametrize("fmt", ["text", "json"])
+def test_verbose_notes_skipped_detection_without_codebase(tmp_path, monkeypatch, fmt):
+    # --verbose explains on stderr why no layout was detected; stdout stays clean
+    monkeypatch.delenv("CODEBASE", raising=False)
+    (tmp_path / "odoo" / "addons").mkdir(parents=True)
+
+    result = runner.invoke(app, ["-v", "--format", fmt, "--odoo-dir", str(tmp_path / "odoo")])
+    assert result.exit_code == 0
+    assert "layout detection skipped" in result.stderr
+    assert "layout detection skipped" not in result.stdout
+    if fmt == "json":
+        assert json.loads(result.stdout)["layout"] is None
+
+
+def test_verbose_no_note_with_codebase():
+    result = runner.invoke(app, ["-v", str(DATA / "trobz")])
+    assert result.exit_code == 0
+    assert "layout detection skipped" not in result.stderr

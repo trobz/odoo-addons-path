@@ -190,7 +190,7 @@ def _process_paths(
 
 
 def get_addons_path(
-    codebase: Path,
+    codebase: Path | None,
     addons_dir: list[Path] | None = None,
     odoo_dir: Path | None = None,
     verbose: bool = False,
@@ -201,9 +201,11 @@ def get_addons_path(
         "addon_repositories": [],
     }
 
-    # Always detect layout so project addons are discovered even when
-    # odoo_dir or addons_dir are given explicitly.
-    if detected_paths is None:
+    # Layout detection runs only when a codebase was given: the caller
+    # passed one explicitly or asked to detect on it. With codebase=None
+    # the result is built purely from the explicit addons_dir/odoo_dir,
+    # so the CWD can never leak into the output.
+    if detected_paths is None and codebase is not None:
         detected_paths = detect_codebase_layout(codebase, verbose)
 
     _process_paths(all_paths, detected_paths or {}, addons_dir, odoo_dir)
