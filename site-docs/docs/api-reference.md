@@ -1,35 +1,5 @@
 # API Reference
 
-## CLI
-
-```
-odoo-addons-path [CODEBASE] [OPTIONS]
-```
-
-### Arguments
-
-| Argument | Description | Default |
-|----------|-------------|---------|
-| `CODEBASE` | Path to the Odoo project whose layout should be detected. Optional — omit it (and `$CODEBASE`) to skip detection and use only `--addons-dir`/`--odoo-dir`. | `None`, or `$CODEBASE` env var |
-
-### Options
-
-| Option | Type | Description |
-|--------|------|-------------|
-| `--addons-dir` | `TEXT` | Comma-separated glob patterns for addon directories. Merged with the detected layout when `CODEBASE` is given; used alone otherwise. |
-| `--odoo-dir` | `TEXT` | Path to Odoo source directory. Merged with the detected layout when `CODEBASE` is given; used alone otherwise. |
-| `--verbose` | flag | Show categorized path breakdown |
-| `--help` | flag | Show help message |
-
-### Exit Codes
-
-| Code | Meaning |
-|------|---------|
-| `0` | Success |
-| `1` | Error (no `CODEBASE`, `--addons-dir`, or `--odoo-dir` given at all; path not found; etc.) |
-
----
-
 ## Python API
 
 ### `get_addons_path`
