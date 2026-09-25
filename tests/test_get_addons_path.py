@@ -22,6 +22,27 @@ def base_dir(tmp_path: Path) -> Path:
     return d
 
 
+def test_no_codebase_means_no_detection(tmp_path: Path) -> None:
+    """Without a codebase argument, layout detection must not run at all:
+    the result is built purely from the explicit dirs, whatever the CWD
+    happens to be. Regression: the CLI used to default the codebase to the
+    CWD and silently merge everything the generic detector found there."""
+    polluted_cwd = tmp_path / "unrelated"
+    (polluted_cwd / "some_module").mkdir(parents=True)
+    (polluted_cwd / "some_module" / "__manifest__.py").touch()
+    (tmp_path / "odoo" / "addons").mkdir(parents=True)
+    (tmp_path / "myaddons").mkdir()
+
+    result = get_addons_path(
+        None,
+        addons_dir=[tmp_path / "myaddons"],
+        odoo_dir=tmp_path / "odoo",
+    )
+
+    assert str(tmp_path / "odoo" / "addons") in result
+    assert str(polluted_cwd) not in result
+
+
 @pytest.mark.parametrize(
     "layout, expected_paths",
     [

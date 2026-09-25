@@ -153,19 +153,23 @@ def get_odoo_edition(addons_path: str) -> str | None:
     return "CE"
 
 
+def get_odoo_addons_dirs(detected_paths: dict, odoo_dir: Path | None) -> list[str]:
+    """Odoo core addons dirs, from the explicit odoo_dir first, then the detected layout."""
+    result: list[str] = []
+    if odoo_dir:
+        _add_to_path(result, [odoo_dir / "addons", odoo_dir / "odoo" / "addons"])
+    if detected_paths.get("odoo_dir"):
+        _add_to_path(result, detected_paths["odoo_dir"])
+    return result
+
+
 def _process_paths(
     all_paths: dict[str, list[str]],
     detected_paths: dict,
     addons_dir: list[Path] | None,
     odoo_dir: Path | None,
 ):
-    if odoo_dir:
-        _add_to_path(
-            all_paths["odoo_dir"],
-            [odoo_dir / "addons", odoo_dir / "odoo" / "addons"],
-        )
-    if detected_paths.get("odoo_dir"):
-        _add_to_path(all_paths["odoo_dir"], detected_paths["odoo_dir"])
+    all_paths["odoo_dir"].extend(get_odoo_addons_dirs(detected_paths, odoo_dir))
 
     all_addon_paths_to_process = (
         (addons_dir or []) + detected_paths.get("addons_dirs", []) + detected_paths.get("addons_dir", [])
@@ -190,7 +194,7 @@ def _process_paths(
 
 
 def get_addons_path(
-    codebase: Path,
+    codebase: Path | None,
     addons_dir: list[Path] | None = None,
     odoo_dir: Path | None = None,
     verbose: bool = False,
@@ -201,9 +205,11 @@ def get_addons_path(
         "addon_repositories": [],
     }
 
-    # Always detect layout so project addons are discovered even when
-    # odoo_dir or addons_dir are given explicitly.
-    if detected_paths is None:
+    # Layout detection runs only when a codebase was given: the caller
+    # passed one explicitly or asked to detect on it. With codebase=None
+    # the result is built purely from the explicit addons_dir/odoo_dir,
+    # so the CWD can never leak into the output.
+    if detected_paths is None and codebase is not None:
         detected_paths = detect_codebase_layout(codebase, verbose)
 
     _process_paths(all_paths, detected_paths or {}, addons_dir, odoo_dir)

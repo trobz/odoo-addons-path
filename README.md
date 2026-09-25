@@ -35,21 +35,19 @@ odoo-addons-path /path/to/your/odoo/project
 # With verbose output (categorized paths)
 odoo-addons-path /path/to/project --verbose
 
-# Manual addon paths - detector SKIPPED (uses explicit path only)
+# Project given + explicit dirs - detector runs, explicit dirs are added to its result
 odoo-addons-path /path/to/project --addons-dir "./addons/*/18.0, ./custom"
-
-# Manual Odoo path - detector SKIPPED (uses explicit path only)
 odoo-addons-path /path/to/project --odoo-dir /opt/odoo
 
-# Both explicit - detector SKIPPED (uses both paths)
-odoo-addons-path /path/to/project --odoo-dir /opt/odoo --addons-dir "./custom"
+# No project given - detector SKIPPED (uses explicit paths only)
+odoo-addons-path --odoo-dir /opt/odoo --addons-dir "./custom"
 
 # Use environment variable with auto-detection
 export CODEBASE=/home/project
 odoo-addons-path
 ```
 
-**Detector Skip Behavior:** Detector is skipped if ANY explicit path is provided (--addons-dir or --odoo-dir). This ensures predictable behavior with explicit configuration.
+**Detection Behavior:** Layout detection runs only on a project path given explicitly, as an argument or through the `CODEBASE` environment variable. The current directory is never detected implicitly. Without a project path, the output is built only from `--addons-dir`/`--odoo-dir`. With neither a project path nor any explicit dir, the command prints an error and exits with status 1.
 
 ### Programmatic Usage
 

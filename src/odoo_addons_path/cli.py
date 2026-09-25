@@ -12,6 +12,7 @@ from .main import (
     check_version_consistency,
     detect_codebase_layout,
     get_addons_path,
+    get_odoo_addons_dirs,
     get_odoo_edition,
     get_odoo_version,
 )
@@ -63,12 +64,12 @@ def _warn_version_discrepancies(addons_path: str) -> None:
 
 
 def _emit_json(
-    codebase: Path,
+    codebase: Path | None,
     addons_dir: list[Path],
     odoo_dir_path: Path | None,
     check_versions: bool,
 ) -> None:
-    layout_name, detected_paths = _detect_layout_named(codebase)
+    layout_name, detected_paths = _detect_layout_named(codebase) if codebase is not None else (None, None)
 
     # Always call get_addons_path so explicit --addons-dir/--odoo-dir are included
     # even when no layout is detected; passing {} skips internal detection without
@@ -81,7 +82,7 @@ def _emit_json(
         verbose=False,
         detected_paths=effective_detected,
     )
-    odoo_dir_list = [str(p) for p in effective_detected.get("odoo_dir", [])]
+    odoo_dir_list = get_odoo_addons_dirs(effective_detected, odoo_dir_path)
 
     version = get_odoo_version(addons_path, odoo_dir=odoo_dir_path, detected_paths=detected_paths)
     edition = get_odoo_edition(addons_path)
@@ -122,16 +123,21 @@ def main(
         ),
     ] = False,
     codebase: Annotated[
-        Path,
+        Path | None,
         typer.Argument(
             envvar="CODEBASE",
-            help="Path to the Odoo project. Can also be set via the CODEBASE environment variable.",
+            help=(
+                "Path to the Odoo project whose layout should be detected. "
+                "Layout detection only runs when this is given explicitly "
+                "(or via the CODEBASE environment variable); without it, only "
+                "the explicit --addons-dir/--odoo-dir options are used."
+            ),
             exists=True,
             file_okay=False,
             dir_okay=True,
             resolve_path=True,
         ),
-    ] = Path("./"),
+    ] = None,
     addons_dir: Annotated[
         list[str] | None,
         typer.Option(
@@ -182,12 +188,31 @@ def main(
 
     paths = _parse_paths(addons_dir)
 
+    if codebase is None and not addons_dir and odoo_dir_path is None:
+        typer.secho(
+            "No input given: pass the path to an Odoo project (or set the CODEBASE "
+            "environment variable), or use --addons-dir/--odoo-dir.",
+            fg=typer.colors.RED,
+            err=True,
+        )
+        raise typer.Exit(1)
+
+    # stderr, so it never mixes with the text or json result on stdout
+    if codebase is None and verbose:
+        typer.secho(
+            "No codebase given: layout detection skipped, using only --addons-dir/--odoo-dir.",
+            fg=typer.colors.YELLOW,
+            err=True,
+        )
+
     if output_format == OutputFormat.json:
         _emit_json(codebase, paths, odoo_dir_path, check_versions)
         raise typer.Exit(0)
 
-    # --format text (default): unchanged behavior
-    detected_paths = detect_codebase_layout(codebase, verbose)
+    # --format text (default): layout detection only runs when the codebase
+    # was given explicitly; without it the output is built purely from the
+    # explicit --addons-dir/--odoo-dir options, whatever the CWD happens to be.
+    detected_paths = detect_codebase_layout(codebase, verbose) if codebase is not None else None
 
     addons_path = get_addons_path(
         codebase=codebase,

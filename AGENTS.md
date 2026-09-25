@@ -22,13 +22,13 @@ src/odoo_addons_path/
 
 Detection: Chain of Responsibility — `TrobzDetector` → `C2CDetector` → `OdooShDetector` → `DoodbaDetector` → `GenericDetector` (fallback)
 
-Detector is **skipped** when ANY explicit `--addons-dir` or `--odoo-dir` is provided.
+Detector runs **only** on an explicitly given codebase (CLI argument or `CODEBASE` env var), never on the CWD implicitly. Explicit `--addons-dir`/`--odoo-dir` are merged with its result. Without a codebase, only the explicit dirs are used; with no codebase and no explicit dirs, the CLI exits 1 with an error.
 
 ## Public API
 
 ```python
 from odoo_addons_path import get_addons_path
-result = get_addons_path(codebase, addons_dir=None, odoo_dir=None, verbose=False)  # -> str
+result = get_addons_path(codebase, addons_dir=None, odoo_dir=None, verbose=False)  # -> str; codebase=None skips detection
 ```
 
 ## Commands
