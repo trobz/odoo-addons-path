@@ -2,6 +2,22 @@
 
 <!-- version list -->
 
+## v2.0.0 (2026-09-25)
+
+### Bug Fixes
+
+- Include explicit --odoo-dir in json "odoo_dir" output
+  ([`32a04bf`](https://github.com/trobz/odoo-addons-path/commit/32a04bf1f0b3f8c06dc78b3ec34f21206dde37ba))
+
+- Layout detection only runs on an explicitly given codebase
+  ([`f1fb83a`](https://github.com/trobz/odoo-addons-path/commit/f1fb83a9f1d2bb2becf17881d3e1ec7e50b77bc5))
+
+### Documentation
+
+- Fix stale site-docs claims about codebase detection
+  ([`40ebe46`](https://github.com/trobz/odoo-addons-path/commit/40ebe46d667b82bdc7afb1985c7ed37d5f7b16a9))
+
+
 ## v1.5.0 (2026-06-12)
 
 ### Features
