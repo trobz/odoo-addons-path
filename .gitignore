@@ -157,6 +157,7 @@ venv.bak/
 
 # mkdocs documentation
 /site
+/site-docs/site
 
 # mypy
 .mypy_cache/
@@ -213,3 +214,10 @@ __marimo__/
 plans/
 repomix-output.xml
 .claude/
+
+# Streamlit
+.streamlit/secrets.toml
+
+# VIM files
+.*.sw?
+.*.un~

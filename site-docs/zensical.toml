@@ -4,13 +4,14 @@ site_url = "https://trobz.github.io/odoo-addons-path/"
 site_description = "Automatically detect and construct Odoo addons_path for Trobz, C2C, Odoo.sh, Doodba, and generic layouts."
 site_author = "Trobz"
 copyright = "Copyright &copy; 2026 Trobz"
-docs_dir = "site-docs/docs"
+docs_dir = "docs"
 site_dir = "site"
 extra_css = ["stylesheets/hero.css", "stylesheets/site.css"]
 
 nav = [
   { Home = "index.md" },
   { "Getting Started" = "getting-started.md" },
+  { "CLI Reference" = "cli-reference.md" },
   { "API Reference" = "api-reference.md" },
   { "Supported Layouts" = "supported-layouts.md" },
 ]
@@ -22,7 +23,7 @@ path = "https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"
 path = "javascripts/hero-scene.js"
 
 [project.theme]
-custom_dir = "site-docs/overrides"
+custom_dir = "overrides"
 language = "en"
 features = [
     "content.code.copy",
@@ -54,3 +55,7 @@ logo = "lucide/terminal"
 [[project.extra.social]]
 icon = "fontawesome/brands/github"
 link = "https://github.com/trobz/odoo-addons-path"
+
+[[project.extra.social]]
+icon = "fontawesome/brands/python"
+link = "https://pypi.org/project/odoo-addons-path/"

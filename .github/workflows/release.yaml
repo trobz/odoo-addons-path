@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
 
 permissions:
   contents: read
@@ -15,11 +19,10 @@ jobs:
 
     permissions:
       contents: write
-      id-token: write
 
-    environment:
-      name: pypi
-      url: https://pypi.org/p/odoo-addons-path
+    outputs:
+      released: ${{ steps.release.outputs.released }}
+      tag: ${{ steps.release.outputs.tag }}
 
     steps:
 
@@ -40,22 +43,34 @@ jobs:
           git_committer_name: "github-actions"
           git_committer_email: "actions@users.noreply.github.com"
 
-      - name: Checkout at release tag
-        if: steps.release.outputs.released == 'true'
+
+  publish:
+    needs: release
+    if: needs.release.outputs.released == 'true'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+      id-token: write
+
+    environment:
+      name: pypi
+      url: https://pypi.org/p/odoo-addons-path
+
+    steps:
+      - name: Check out at new tag
         uses: actions/checkout@v6
         with:
-          ref: ${{ steps.release.outputs.tag }}
+          ref: ${{ needs.release.outputs.tag }}
 
       - name: Set up the environment
-        if: steps.release.outputs.released == 'true'
         uses: ./.github/actions/setup-python-env
 
       - name: Build Package
-        if: steps.release.outputs.released == 'true'
         run: make build
 
       - name: Publish package distributions to PyPI
-        if: steps.release.outputs.released == 'true'
-        uses: pypa/gh-action-pypi-publish@v1.13.0
+        uses: pypa/gh-action-pypi-publish@v1.14.2
         with:
           packages-dir: dist
