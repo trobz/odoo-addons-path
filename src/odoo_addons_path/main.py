@@ -139,15 +139,16 @@ _EE_DIR_NAMES = {"enterprise", "odoo-enterprise"}
 def get_odoo_edition(addons_path: str) -> str | None:
     """Return the Odoo edition inferred from the addons path.
 
-    ``'EE'`` if an Enterprise addons dir (``enterprise`` / ``odoo-enterprise``)
-    is present, ``'CE'`` if addons are found without it, or ``None`` when the
-    addons path is empty.
+    ``'EE'`` if an Enterprise addons dir (``enterprise`` / ``odoo-enterprise``,
+    or a version subdir of it such as ``enterprise/20.0``) is present, ``'CE'``
+    if addons are found without it, or ``None`` when the addons path is empty.
     """
     if not addons_path:
         return None
 
     for path_str in addons_path.split(","):
-        if Path(path_str).name in _EE_DIR_NAMES:
+        path = Path(path_str)
+        if path.name in _EE_DIR_NAMES or path.parent.name in _EE_DIR_NAMES:
             return "EE"
 
     return "CE"
