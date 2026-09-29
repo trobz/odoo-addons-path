@@ -2,6 +2,14 @@
 
 <!-- version list -->
 
+## v2.0.1 (2026-09-29)
+
+### Bug Fixes
+
+- Detect Enterprise edition for versioned enterprise addons dirs
+  ([`cbe98a7`](https://github.com/trobz/odoo-addons-path/commit/cbe98a7ea8695b68f5394ac3dd8bfc612e9faea2))
+
+
 ## v2.0.0 (2026-09-25)
 
 ### Bug Fixes
