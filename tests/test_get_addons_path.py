@@ -289,3 +289,17 @@ class TestGetOdooVersion:
         detected_paths = {"odoo_dir": [addons_dir]}
         result = get_odoo_version("", detected_paths=detected_paths)
         assert result == "17.0"
+
+
+@pytest.mark.parametrize(
+    ("addons_path", "expected"),
+    [
+        ("/src/odoo/20.0/addons,/src/enterprise", "EE"),
+        ("/src/odoo/20.0/addons,/src/enterprise/20.0", "EE"),
+        ("/src/odoo/20.0/addons,/src/odoo-enterprise/20.0", "EE"),
+        ("/src/odoo/20.0/addons,/src/custom/20.0", "CE"),
+        ("", None),
+    ],
+)
+def test_get_odoo_edition_versioned_enterprise_dir(addons_path, expected):
+    assert get_odoo_edition(addons_path) == expected
